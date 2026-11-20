@@ -1,4 +1,4 @@
-export type TipoMovimiento = 'ENTRADA' | 'SALIDA';
+export type TipoMovimiento = 'entrada' | 'salida';
 
 export interface Movimiento {
   id: number;

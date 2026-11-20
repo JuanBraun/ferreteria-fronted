@@ -4,7 +4,6 @@ import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { apiClient } from '../../api/apiClient';
 import { useAuth } from '../../hooks/useAuth';
 import type { Movimiento, TipoMovimiento } from '../../types/movimiento';
-import type { PaginatedData } from '../../types/api';
 
 interface ProductoOption {
   id: number;
@@ -20,7 +19,7 @@ export function MovimientoDetailPage() {
 
   const [productos, setProductos] = useState<ProductoOption[]>([]);
   const [productoId, setProductoId] = useState<number>(1);
-  const [tipo, setTipo] = useState<TipoMovimiento>('ENTRADA');
+  const [tipo, setTipo] = useState<TipoMovimiento>('entrada');
   const [cantidad, setCantidad] = useState<number>(1);
   const [motivo, setMotivo] = useState('');
   const [fecha, setFecha] = useState('');
@@ -34,9 +33,9 @@ export function MovimientoDetailPage() {
 
     const inicializar = async () => {
       try {
-        const res = await apiClient.get<PaginatedData<ProductoOption> | ProductoOption[]>('/productos?limit=100');
+        const res = await apiClient.get<{ productos?: ProductoOption[]; items?: ProductoOption[] } | ProductoOption[]>('/productos?limit=100');
         if (!activo) return;
-        const lista = Array.isArray(res) ? res : res.items || [];
+        const lista = Array.isArray(res) ? res : res.productos || res.items || [];
         setProductos(lista);
         if (isNew && lista.length > 0) {
           setProductoId(lista[0].id);
@@ -188,8 +187,8 @@ export function MovimientoDetailPage() {
                 onChange={(e) => setTipo(e.target.value as TipoMovimiento)}
                 required
               >
-                <option value="ENTRADA">ENTRADA (Ingreso de stock)</option>
-                <option value="SALIDA">SALIDA (Egreso / Venta)</option>
+                <option value="entrada">ENTRADA (Ingreso de stock)</option>
+                <option value="salida">SALIDA (Egreso / Venta)</option>
               </select>
             </div>
 

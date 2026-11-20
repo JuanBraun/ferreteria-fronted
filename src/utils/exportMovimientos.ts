@@ -6,7 +6,7 @@ export function exportarMovimientosExcel(movimientos: Movimiento[]) {
   const filas = movimientos.map((m) => ({
     ID: m.id,
     Fecha: new Date(m.fecha).toLocaleDateString('es-AR'),
-    Tipo: m.tipo,
+    Tipo: m.tipo.toUpperCase(),
     Producto: m.productoNombre || `Producto #${m.productoId}`,
     Cantidad: m.cantidad,
     Motivo: m.motivo,

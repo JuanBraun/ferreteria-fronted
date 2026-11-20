@@ -155,8 +155,8 @@ export function MovimientosListPage() {
           }}
         >
           <option value="">Todos los tipos</option>
-          <option value="ENTRADA">Solo Entradas</option>
-          <option value="SALIDA">Solo Salidas</option>
+          <option value="entrada">Solo Entradas</option>
+          <option value="salida">Solo Salidas</option>
         </select>
 
         <select
@@ -225,7 +225,7 @@ export function MovimientosListPage() {
                     {new Date(mov.fecha).toLocaleDateString('es-AR')}
                   </td>
                   <td style={{ padding: '0.85rem 1rem' }}>
-                    {mov.tipo === 'ENTRADA' ? (
+                    {mov.tipo === 'entrada' ? (
                       <span
                         style={{
                           display: 'inline-flex',
