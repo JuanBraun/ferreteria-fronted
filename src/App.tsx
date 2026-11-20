@@ -8,6 +8,8 @@ import { RegisterPage } from './pages/auth/RegisterPage';
 import { RecoverPage } from './pages/auth/RecoverPage';
 import { HomePage } from './pages/HomePage';
 import { ProfilePage } from './pages/ProfilePage';
+import { MovimientosListPage } from './pages/movimientos/MovimientosListPage';
+import { MovimientoDetailPage } from './pages/movimientos/MovimientoDetailPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -49,7 +51,8 @@ export function App() {
             <Route path="productos" element={<ModuloEnConstruccion nombre="Productos" />} />
             <Route path="categorias" element={<ModuloEnConstruccion nombre="Categorías" />} />
             <Route path="proveedores" element={<ModuloEnConstruccion nombre="Proveedores" />} />
-            <Route path="movimientos" element={<ModuloEnConstruccion nombre="Movimientos de Stock" />} />
+            <Route path="movimientos" element={<MovimientosListPage />} />
+            <Route path="movimientos/:id" element={<MovimientoDetailPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
