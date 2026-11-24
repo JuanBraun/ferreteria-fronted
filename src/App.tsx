@@ -1,15 +1,17 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { useAuth } from './hooks/useAuth';
-import { MainLayout } from './components/layout/MainLayout';
-import { LoginPage } from './pages/auth/LoginPage';
-import { RegisterPage } from './pages/auth/RegisterPage';
-import { RecoverPage } from './pages/auth/RecoverPage';
-import { HomePage } from './pages/HomePage';
-import { ProfilePage } from './pages/ProfilePage';
-import { MovimientosListPage } from './pages/movimientos/MovimientosListPage';
-import { MovimientoDetailPage } from './pages/movimientos/MovimientoDetailPage';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./hooks/useAuth";
+import { MainLayout } from "./components/layout/MainLayout";
+import { LoginPage } from "./pages/auth/LoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { RecoverPage } from "./pages/auth/RecoverPage";
+import { HomePage } from "./pages/HomePage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { MovimientosListPage } from "./pages/movimientos/MovimientosListPage";
+import { MovimientoDetailPage } from "./pages/movimientos/MovimientoDetailPage";
+import { ProveedoresListPage } from "./pages/proveedores/ProveedoresListPage";
+import { ProveedorDetailPage } from "./pages/proveedores/ProveedorDetailPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -19,9 +21,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function ModuloEnConstruccion({ nombre }: { nombre: string }) {
   return (
     <div className="card">
-      <h2 style={{ marginBottom: '0.5rem' }}>Módulo de {nombre}</h2>
-      <p style={{ color: 'var(--text-muted)' }}>
-        Vista base lista para integrar el listado paginado, detalle/ABM y exportación.
+      <h2 style={{ marginBottom: "0.5rem" }}>Módulo de {nombre}</h2>
+      <p style={{ color: "var(--text-muted)" }}>
+        Vista base lista para integrar el listado paginado, detalle/ABM y
+        exportación.
       </p>
     </div>
   );
@@ -48,9 +51,16 @@ export function App() {
           >
             <Route index element={<HomePage />} />
             <Route path="perfil" element={<ProfilePage />} />
-            <Route path="productos" element={<ModuloEnConstruccion nombre="Productos" />} />
-            <Route path="categorias" element={<ModuloEnConstruccion nombre="Categorías" />} />
-            <Route path="proveedores" element={<ModuloEnConstruccion nombre="Proveedores" />} />
+            <Route
+              path="productos"
+              element={<ModuloEnConstruccion nombre="Productos" />}
+            />
+            <Route
+              path="categorias"
+              element={<ModuloEnConstruccion nombre="Categorías" />}
+            />
+            <Route path="proveedores" element={<ProveedoresListPage />} />
+            <Route path="proveedores/:id" element={<ProveedorDetailPage />} />
             <Route path="movimientos" element={<MovimientosListPage />} />
             <Route path="movimientos/:id" element={<MovimientoDetailPage />} />
           </Route>
