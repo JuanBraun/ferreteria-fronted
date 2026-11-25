@@ -12,6 +12,8 @@ import { MovimientosListPage } from "./pages/movimientos/MovimientosListPage";
 import { MovimientoDetailPage } from "./pages/movimientos/MovimientoDetailPage";
 import { ProveedoresListPage } from "./pages/proveedores/ProveedoresListPage";
 import { ProveedorDetailPage } from "./pages/proveedores/ProveedorDetailPage";
+import { ProductoListPage } from "./pages/productos/ProductoListPage";
+import { ProductoDetailPage } from "./pages/productos/ProductoDetailPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -51,10 +53,12 @@ export function App() {
           >
             <Route index element={<HomePage />} />
             <Route path="perfil" element={<ProfilePage />} />
-            <Route
-              path="productos"
-              element={<ModuloEnConstruccion nombre="Productos" />}
-            />
+
+              <Route path="productos" element={<ProductoListPage />} />
+              <Route path="productos/nuevo" element={<ProductoDetailPage modo="crear" />} />
+              <Route path="productos/:id" element={<ProductoDetailPage modo="detalle" />} />
+              <Route path="productos/:id/editar" element={<ProductoDetailPage modo="editar" />} />
+            
             <Route
               path="categorias"
               element={<ModuloEnConstruccion nombre="Categorías" />}
