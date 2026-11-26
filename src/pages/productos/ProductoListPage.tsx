@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, AlertTriangle } from 'lucide-react';
 import { productoApi } from '../../api/productoApi';
+import { FileSpreadsheet, FileText } from 'lucide-react';
+import { exportarProductosExcel, exportarProductosPDF } from '../../utils/exportProductos';
 import type { Producto } from '../../types/producto';
 
 export function ProductoListPage() {
@@ -33,7 +35,7 @@ export function ProductoListPage() {
             limit,
             sortBy,
             order,
-            nombre: search.trim() || undefined,
+            search: search.trim() || undefined,
             categoria: categoriaFiltro || undefined,
             });
 
@@ -85,13 +87,31 @@ export function ProductoListPage() {
             </p>
         </div>
 
-        <button
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="btn btn-outline"
+            disabled={productos.length === 0}
+            onClick={() => exportarProductosExcel(productos)}
+          >
+            <FileSpreadsheet size={16} /> Excel
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline"
+            disabled={productos.length === 0}
+            onClick={() => exportarProductosPDF(productos)}
+          >
+            <FileText size={16} /> PDF
+          </button>
+          <button
             type="button"
             className="btn btn-primary"
             onClick={() => navigate('/productos/nuevo')}
-        >
+          >
             <Plus size={16} /> Nuevo Producto
-            </button>
+          </button>
+        </div>
         </div>
 
         <div

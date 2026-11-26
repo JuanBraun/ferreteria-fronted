@@ -16,7 +16,9 @@ export interface ProductoFiltros {
     limit?: number;
     sortBy?: keyof Producto;
     order?: 'asc' | 'desc';
+    search?: string;
     nombre?: string;
     codigo?: string;
     categoria?: string;
+    bajoStock?: string;
 }
