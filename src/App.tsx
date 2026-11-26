@@ -63,7 +63,7 @@ export function App() {
             <Route path="productos" element={<ProductoListPage />} />
             <Route
               path="productos/nuevo"
-              element={<ProductoDetailPage modo="crear" />}
+              element={<ProductoDetailPage key="nuevo" modo="crear" />}
             />
             <Route
               path="productos/:id"

@@ -38,9 +38,6 @@ export function ProductoDetailPage({
 
     useEffect(() => {
         if (esCreacion || !id) {
-        setLoading(false);
-        setEditando(true);
-        setForm(ESTADO_INICIAL);
         return;
     }
 
