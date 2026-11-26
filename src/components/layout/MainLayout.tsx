@@ -9,7 +9,7 @@ import {
   LogOut,
   Wrench,
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth';
 
 export function MainLayout() {
   const { user, logout } = useAuth();
@@ -32,9 +32,11 @@ export function MainLayout() {
           <NavLink to="/productos" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <Package size={18} /> Productos
           </NavLink>
-          <NavLink to="/categorias" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Tags size={18} /> Categorías
-          </NavLink>
+          {user?.rol !== 'Empleado' && (
+            <NavLink to="/categorias" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <Tags size={18} /> Categorías
+            </NavLink>
+          )}
           <NavLink to="/proveedores" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <Truck size={18} /> Proveedores
           </NavLink>

@@ -1,9 +1,72 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Tags, Truck, ArrowLeftRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { productoApi } from '../api/productoApi';
+import { categoriaApi } from '../api/categoriaApi';
+import { apiClient } from '../api/apiClient';
+import type { PaginatedData } from '../types/api';
+import type { Movimiento } from '../types/movimiento';
 
 export function HomePage() {
   const { user } = useAuth();
+
+  const [stats, setStats] = useState({
+    totalProductos: 0,
+    totalCategorias: 0,
+    bajoStock: 0,
+    totalMovimientos: 0,
+    entradas: 0,
+    salidas: 0,
+    apiOnline: true,
+  });
+
+  useEffect(() => {
+    let activo = true;
+
+    const cargarMetricas = async () => {
+      try {
+        const [prodData, catData, movData] = await Promise.all([
+          productoApi.listar({ limit: 100 }),
+          categoriaApi.listar({ limit: 100 }),
+          apiClient.get<PaginatedData<Movimiento>>('/movimientos?limit=100'),
+        ]);
+
+        if (!activo) return;
+
+        const productosBajoStock = prodData.items.filter(
+          (p) => p.stockActual <= p.stockMinimo
+        ).length;
+
+        const entradas = movData.items.filter(
+          (m) => m.tipo.toUpperCase() === 'ENTRADA' || m.tipo.toUpperCase() === 'INGRESO'
+        ).length;
+
+        const salidas = movData.items.filter(
+          (m) => m.tipo.toUpperCase() === 'SALIDA' || m.tipo.toUpperCase() === 'EGRESO'
+        ).length;
+
+        setStats({
+          totalProductos: prodData.meta.total,
+          totalCategorias: catData.meta.total,
+          bajoStock: productosBajoStock,
+          totalMovimientos: movData.meta.total,
+          entradas,
+          salidas,
+          apiOnline: true,
+        });
+      } catch {
+        if (activo) {
+          setStats((prev) => ({ ...prev, apiOnline: false }));
+        }
+      }
+    };
+
+    void cargarMetricas();
+    return () => {
+      activo = false;
+    };
+  }, []);
 
   const modulos = [
     {
@@ -12,6 +75,7 @@ export function HomePage() {
       ruta: '/productos',
       icono: <Package size={24} color="#14362b" />,
       responsable: 'Módulo Core',
+      visible: true,
     },
     {
       titulo: 'Categorías',
@@ -19,6 +83,7 @@ export function HomePage() {
       ruta: '/categorias',
       icono: <Tags size={24} color="#14362b" />,
       responsable: 'Clasificación',
+      visible: user?.rol !== 'Empleado',
     },
     {
       titulo: 'Proveedores',
@@ -26,6 +91,7 @@ export function HomePage() {
       ruta: '/proveedores',
       icono: <Truck size={24} color="#14362b" />,
       responsable: 'Compras',
+      visible: true,
     },
     {
       titulo: 'Movimientos de Stock',
@@ -33,8 +99,9 @@ export function HomePage() {
       ruta: '/movimientos',
       icono: <ArrowLeftRight size={24} color="#14362b" />,
       responsable: 'Trazabilidad',
+      visible: true,
     },
-  ];
+  ].filter((m) => m.visible);
 
   return (
     <div>
@@ -63,8 +130,12 @@ export function HomePage() {
             </span>
             <Package size={18} color="#14362b" />
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.5rem' }}>148</div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--success)' }}>En 12 categorías</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.5rem' }}>
+            {stats.totalProductos}
+          </div>
+          <span style={{ fontSize: '0.8rem', color: 'var(--success)' }}>
+            En {stats.totalCategorias} categorías
+          </span>
         </div>
 
         <div className="card">
@@ -75,7 +146,7 @@ export function HomePage() {
             <AlertTriangle size={18} color="#d97706" />
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.5rem', color: 'var(--warning)' }}>
-            6
+            {stats.bajoStock}
           </div>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Requieren reposición</span>
         </div>
@@ -83,12 +154,16 @@ export function HomePage() {
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
-              MOVIMIENTOS DEL MES
+              MOVIMIENTOS REGISTRADOS
             </span>
             <ArrowLeftRight size={18} color="#14362b" />
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.5rem' }}>84</div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>52 entradas · 32 salidas</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.5rem' }}>
+            {stats.totalMovimientos}
+          </div>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {stats.entradas} entradas · {stats.salidas} salidas
+          </span>
         </div>
 
         <div className="card">
@@ -96,12 +171,21 @@ export function HomePage() {
             <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
               ESTADO DEL SISTEMA
             </span>
-            <CheckCircle2 size={18} color="#16a34a" />
+            <CheckCircle2 size={18} color={stats.apiOnline ? '#16a34a' : '#dc2626'} />
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '0.7rem', color: 'var(--success)' }}>
-            Operativo
+          <div
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              marginTop: '0.7rem',
+              color: stats.apiOnline ? 'var(--success)' : '#dc2626',
+            }}
+          >
+            {stats.apiOnline ? 'Operativo' : 'Sin conexión'}
           </div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>API v1 conectada</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {stats.apiOnline ? 'API v1 conectada' : 'Verificar servidor backend'}
+          </span>
         </div>
       </div>
 

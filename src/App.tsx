@@ -14,22 +14,27 @@ import { ProveedoresListPage } from "./pages/proveedores/ProveedoresListPage";
 import { ProveedorDetailPage } from "./pages/proveedores/ProveedorDetailPage";
 import { ProductoListPage } from "./pages/productos/ProductoListPage";
 import { ProductoDetailPage } from "./pages/productos/ProductoDetailPage";
+import { CategoriasListPage } from "./pages/categorias/CategoriasListPage";
+import { CategoriaDetailPage } from "./pages/categorias/CategoriaDetailPage";
+import type { RolUsuario } from "./types/api";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-function ModuloEnConstruccion({ nombre }: { nombre: string }) {
-  return (
-    <div className="card">
-      <h2 style={{ marginBottom: "0.5rem" }}>Módulo de {nombre}</h2>
-      <p style={{ color: "var(--text-muted)" }}>
-        Vista base lista para integrar el listado paginado, detalle/ABM y
-        exportación.
-      </p>
-    </div>
-  );
+function RoleRoute({
+  children,
+  rolesPermitidos,
+}: {
+  children: React.ReactNode;
+  rolesPermitidos: RolUsuario[];
+}) {
+  const { user } = useAuth();
+  if (!user || !rolesPermitidos.includes(user.rol)) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
 }
 
 export function App() {
@@ -54,17 +59,44 @@ export function App() {
             <Route index element={<HomePage />} />
             <Route path="perfil" element={<ProfilePage />} />
 
-              <Route path="productos" element={<ProductoListPage />} />
-              <Route path="productos/nuevo" element={<ProductoDetailPage modo="crear" />} />
-              <Route path="productos/:id" element={<ProductoDetailPage modo="detalle" />} />
-              <Route path="productos/:id/editar" element={<ProductoDetailPage modo="editar" />} />
-            
+            {/* Productos */}
+            <Route path="productos" element={<ProductoListPage />} />
+            <Route
+              path="productos/nuevo"
+              element={<ProductoDetailPage modo="crear" />}
+            />
+            <Route
+              path="productos/:id"
+              element={<ProductoDetailPage modo="detalle" />}
+            />
+            <Route
+              path="productos/:id/editar"
+              element={<ProductoDetailPage modo="editar" />}
+            />
+
+            {/* Categorías (Restringido a Administrador y Encargado) */}
             <Route
               path="categorias"
-              element={<ModuloEnConstruccion nombre="Categorías" />}
+              element={
+                <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
+                  <CategoriasListPage />
+                </RoleRoute>
+              }
             />
+            <Route
+              path="categorias/:id"
+              element={
+                <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
+                  <CategoriaDetailPage />
+                </RoleRoute>
+              }
+            />
+
+            {/* Proveedores */}
             <Route path="proveedores" element={<ProveedoresListPage />} />
             <Route path="proveedores/:id" element={<ProveedorDetailPage />} />
+
+            {/* Movimientos */}
             <Route path="movimientos" element={<MovimientosListPage />} />
             <Route path="movimientos/:id" element={<MovimientoDetailPage />} />
           </Route>
