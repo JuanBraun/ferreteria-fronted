@@ -7,6 +7,7 @@ import { categoriaApi } from '../api/categoriaApi';
 import { apiClient } from '../api/apiClient';
 import type { PaginatedData } from '../types/api';
 import type { Movimiento } from '../types/movimiento';
+import type { Producto } from '../types/producto';
 
 export function HomePage() {
   const { user } = useAuth();
@@ -35,15 +36,15 @@ export function HomePage() {
         if (!activo) return;
 
         const productosBajoStock = prodData.items.filter(
-          (p) => p.stockActual <= p.stockMinimo
+          (p: Producto) => p.stockActual <= p.stockMinimo
         ).length;
 
         const entradas = movData.items.filter(
-          (m) => m.tipo.toUpperCase() === 'ENTRADA' || m.tipo.toUpperCase() === 'INGRESO'
+          (m: Movimiento) => m.tipo.toUpperCase() === 'ENTRADA' || m.tipo.toUpperCase() === 'INGRESO'
         ).length;
 
         const salidas = movData.items.filter(
-          (m) => m.tipo.toUpperCase() === 'SALIDA' || m.tipo.toUpperCase() === 'EGRESO'
+          (m: Movimiento) => m.tipo.toUpperCase() === 'SALIDA' || m.tipo.toUpperCase() === 'EGRESO'
         ).length;
 
         setStats({

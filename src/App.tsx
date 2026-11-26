@@ -14,7 +14,7 @@ import { ProveedoresListPage } from "./pages/proveedores/ProveedoresListPage";
 import { ProveedorDetailPage } from "./pages/proveedores/ProveedorDetailPage";
 import { ProductoListPage } from "./pages/productos/ProductoListPage";
 import { ProductoDetailPage } from "./pages/productos/ProductoDetailPage";
-import { CategoriasListPage } from "./pages/categorias/CategoriasListPage";
+import { CategoriasListPage } from "./pages/categorias/CategoriaListPage";
 import { CategoriaDetailPage } from "./pages/categorias/CategoriaDetailPage";
 import type { RolUsuario } from "./types/api";
 
