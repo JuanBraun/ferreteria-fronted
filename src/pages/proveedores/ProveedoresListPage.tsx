@@ -5,9 +5,12 @@ import { apiClient } from '../../api/apiClient';
 import type { PaginatedData } from '../../types/api';
 import type { Proveedor } from '../../types/proveedor';
 import { exportarProveedoresExcel, exportarProveedoresPDF } from '../../utils/exportProveedores';
+import { useAuth } from '../../hooks/useAuth';
+import { puedeCrear } from '../../utils/permisos';
 
 export function ProveedoresListPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [total, setTotal] = useState(0);
@@ -104,13 +107,15 @@ export function ProveedoresListPage() {
           >
             <FileText size={16} /> PDF
           </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => navigate('/proveedores/nuevo')}
-          >
-            <Plus size={16} /> Nuevo Proveedor
-          </button>
+          {puedeCrear(user?.rol, 'proveedores') && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => navigate('/proveedores/nuevo')}
+            >
+              <Plus size={16} /> Nuevo Proveedor
+            </button>
+          )}
         </div>
       </div>
 

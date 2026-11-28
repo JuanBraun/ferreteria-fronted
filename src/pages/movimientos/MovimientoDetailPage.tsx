@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { apiClient } from '../../api/apiClient';
 import { useAuth } from '../../hooks/useAuth';
+import { puedeCrear, puedeEditar, puedeEliminar } from '../../utils/permisos';
 import type { Movimiento, TipoMovimiento } from '../../types/movimiento';
 
 interface ProductoOption {
@@ -16,6 +17,11 @@ export function MovimientoDetailPage() {
   const isNew = id === 'nuevo';
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const habilitadoGuardar = isNew
+    ? puedeCrear(user?.rol, 'movimientos')
+    : puedeEditar(user?.rol, 'movimientos');
+  const habilitadoEliminar = puedeEliminar(user?.rol, 'movimientos');
 
   const [productos, setProductos] = useState<ProductoOption[]>([]);
   const [productoId, setProductoId] = useState<number>(1);
@@ -73,6 +79,8 @@ export function MovimientoDetailPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!habilitadoGuardar) return;
+
     setError('');
     setSaving(true);
     try {
@@ -100,6 +108,7 @@ export function MovimientoDetailPage() {
   };
 
   const handleDelete = async () => {
+    if (!habilitadoEliminar) return;
     if (!window.confirm('¿Estás seguro de que querés eliminar este movimiento?')) return;
     setSaving(true);
     try {
@@ -139,7 +148,7 @@ export function MovimientoDetailPage() {
             )}
           </div>
 
-          {!isNew && (
+          {!isNew && habilitadoEliminar && (
             <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={saving}>
               <Trash2 size={16} /> Eliminar
             </button>
@@ -185,6 +194,7 @@ export function MovimientoDetailPage() {
                 className="form-control"
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value as TipoMovimiento)}
+                disabled={!habilitadoGuardar}
                 required
               >
                 <option value="entrada">ENTRADA (Ingreso de stock)</option>
@@ -200,6 +210,7 @@ export function MovimientoDetailPage() {
                 className="form-control"
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
+                disabled={!habilitadoGuardar}
                 required
               />
             </div>
@@ -213,17 +224,20 @@ export function MovimientoDetailPage() {
               placeholder="Ej: Compra a proveedor, venta mostrador, ajuste de inventario..."
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
+              disabled={!habilitadoGuardar}
               required
             />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
             <button type="button" className="btn btn-outline" onClick={() => navigate('/movimientos')}>
-              Cancelar
+              {habilitadoGuardar ? 'Cancelar' : 'Volver'}
             </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              <Save size={16} /> {saving ? 'Guardando...' : isNew ? 'Registrar Movimiento' : 'Guardar Cambios'}
-            </button>
+            {habilitadoGuardar && (
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                <Save size={16} /> {saving ? 'Guardando...' : isNew ? 'Registrar Movimiento' : 'Guardar Cambios'}
+              </button>
+            )}
           </div>
         </form>
       </div>

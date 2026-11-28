@@ -2,12 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { apiClient } from '../../api/apiClient';
+import { useAuth } from '../../hooks/useAuth';
+import { puedeCrear, puedeEditar, puedeEliminar } from '../../utils/permisos';
 import type { Proveedor } from '../../types/proveedor';
 
 export function ProveedorDetailPage() {
   const { id } = useParams();
   const isNew = id === 'nuevo';
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const habilitadoGuardar = isNew
+    ? puedeCrear(user?.rol, 'proveedores')
+    : puedeEditar(user?.rol, 'proveedores');
+  const habilitadoEliminar = puedeEliminar(user?.rol, 'proveedores');
 
   const [nombre, setNombre] = useState('');
   const [contacto, setContacto] = useState('');
@@ -51,6 +59,8 @@ export function ProveedorDetailPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!habilitadoGuardar) return;
+
     setError('');
     setSaving(true);
     try {
@@ -76,6 +86,7 @@ export function ProveedorDetailPage() {
   };
 
   const handleDelete = async () => {
+    if (!habilitadoEliminar) return;
     if (!window.confirm('¿Estás seguro de que querés eliminar este proveedor?')) return;
     setSaving(true);
     try {
@@ -113,7 +124,7 @@ export function ProveedorDetailPage() {
             </span>
           </div>
 
-          {!isNew && (
+          {!isNew && habilitadoEliminar && (
             <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={saving}>
               <Trash2 size={16} /> Eliminar
             </button>
@@ -131,6 +142,7 @@ export function ProveedorDetailPage() {
               placeholder="Ej: Distribuidora del Sur S.A."
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
+              disabled={!habilitadoGuardar}
               required
             />
           </div>
@@ -144,6 +156,7 @@ export function ProveedorDetailPage() {
                 placeholder="Ej: Carlos Gómez"
                 value={contacto}
                 onChange={(e) => setContacto(e.target.value)}
+                disabled={!habilitadoGuardar}
               />
             </div>
 
@@ -155,6 +168,7 @@ export function ProveedorDetailPage() {
                 placeholder="Ej: 291-4551234"
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
+                disabled={!habilitadoGuardar}
               />
             </div>
           </div>
@@ -168,6 +182,7 @@ export function ProveedorDetailPage() {
                 placeholder="contacto@proveedor.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={!habilitadoGuardar}
               />
             </div>
 
@@ -179,17 +194,20 @@ export function ProveedorDetailPage() {
                 placeholder="Ej: Av. Colón 1250, Bahía Blanca"
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
+                disabled={!habilitadoGuardar}
               />
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
             <button type="button" className="btn btn-outline" onClick={() => navigate('/proveedores')}>
-              Cancelar
+              {habilitadoGuardar ? 'Cancelar' : 'Volver'}
             </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              <Save size={16} /> {saving ? 'Guardando...' : isNew ? 'Registrar Proveedor' : 'Guardar Cambios'}
-            </button>
+            {habilitadoGuardar && (
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                <Save size={16} /> {saving ? 'Guardando...' : isNew ? 'Registrar Proveedor' : 'Guardar Cambios'}
+              </button>
+            )}
           </div>
         </form>
       </div>

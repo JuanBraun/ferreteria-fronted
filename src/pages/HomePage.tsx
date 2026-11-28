@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { productoApi } from '../api/productoApi';
 import { categoriaApi } from '../api/categoriaApi';
 import { apiClient } from '../api/apiClient';
+import { puedeVerModulo } from '../utils/permisos';
 import type { PaginatedData } from '../types/api';
 import type { Movimiento } from '../types/movimiento';
 import type { Producto } from '../types/producto';
@@ -76,7 +77,7 @@ export function HomePage() {
       ruta: '/productos',
       icono: <Package size={24} color="#14362b" />,
       responsable: 'Módulo Core',
-      visible: true,
+      visible: puedeVerModulo(user?.rol, 'productos'),
     },
     {
       titulo: 'Categorías',
@@ -84,7 +85,7 @@ export function HomePage() {
       ruta: '/categorias',
       icono: <Tags size={24} color="#14362b" />,
       responsable: 'Clasificación',
-      visible: user?.rol !== 'Empleado',
+      visible: puedeVerModulo(user?.rol, 'categorias'),
     },
     {
       titulo: 'Proveedores',
@@ -92,7 +93,7 @@ export function HomePage() {
       ruta: '/proveedores',
       icono: <Truck size={24} color="#14362b" />,
       responsable: 'Compras',
-      visible: true,
+      visible: puedeVerModulo(user?.rol, 'proveedores'),
     },
     {
       titulo: 'Movimientos de Stock',
@@ -100,7 +101,7 @@ export function HomePage() {
       ruta: '/movimientos',
       icono: <ArrowLeftRight size={24} color="#14362b" />,
       responsable: 'Trazabilidad',
-      visible: true,
+      visible: puedeVerModulo(user?.rol, 'movimientos'),
     },
   ].filter((m) => m.visible);
 

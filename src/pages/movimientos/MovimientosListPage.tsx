@@ -5,9 +5,12 @@ import { apiClient } from '../../api/apiClient';
 import type { PaginatedData } from '../../types/api';
 import type { Movimiento } from '../../types/movimiento';
 import { exportarMovimientosExcel, exportarMovimientosPDF } from '../../utils/exportMovimientos';
+import { useAuth } from '../../hooks/useAuth';
+import { puedeCrear } from '../../utils/permisos';
 
 export function MovimientosListPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [total, setTotal] = useState(0);
@@ -106,13 +109,15 @@ export function MovimientosListPage() {
           >
             <FileText size={16} /> PDF
           </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => navigate('/movimientos/nuevo')}
-          >
-            <Plus size={16} /> Nuevo Movimiento
-          </button>
+          {puedeCrear(user?.rol, 'movimientos') && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => navigate('/movimientos/nuevo')}
+            >
+              <Plus size={16} /> Nuevo Movimiento
+            </button>
+          )}
         </div>
       </div>
 

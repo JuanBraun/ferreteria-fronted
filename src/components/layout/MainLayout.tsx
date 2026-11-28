@@ -10,6 +10,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { puedeVerModulo } from '../../utils/permisos';
 
 export function MainLayout() {
   const { user, logout } = useAuth();
@@ -29,20 +30,26 @@ export function MainLayout() {
           <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <LayoutDashboard size={18} /> Inicio / Dashboard
           </NavLink>
-          <NavLink to="/productos" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Package size={18} /> Productos
-          </NavLink>
-          {user?.rol !== 'Empleado' && (
+          {puedeVerModulo(user?.rol, 'productos') && (
+            <NavLink to="/productos" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <Package size={18} /> Productos
+            </NavLink>
+          )}
+          {puedeVerModulo(user?.rol, 'categorias') && (
             <NavLink to="/categorias" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <Tags size={18} /> Categorías
             </NavLink>
           )}
-          <NavLink to="/proveedores" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Truck size={18} /> Proveedores
-          </NavLink>
-          <NavLink to="/movimientos" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <ArrowLeftRight size={18} /> Movimientos
-          </NavLink>
+          {puedeVerModulo(user?.rol, 'proveedores') && (
+            <NavLink to="/proveedores" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <Truck size={18} /> Proveedores
+            </NavLink>
+          )}
+          {puedeVerModulo(user?.rol, 'movimientos') && (
+            <NavLink to="/movimientos" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <ArrowLeftRight size={18} /> Movimientos
+            </NavLink>
+          )}
           <NavLink to="/perfil" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <User size={18} /> Mi Perfil
           </NavLink>

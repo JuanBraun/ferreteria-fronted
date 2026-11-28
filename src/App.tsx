@@ -59,31 +59,32 @@ export function App() {
             <Route index element={<HomePage />} />
             <Route path="perfil" element={<ProfilePage />} />
 
-            {/* Productos */}
+            {/* Productos (Lectura para todos; Alta/Edición solo Admin y Encargado) */}
             <Route path="productos" element={<ProductoListPage />} />
             <Route
               path="productos/nuevo"
-              element={<ProductoDetailPage key="nuevo" modo="crear" />}
-            />
-            <Route
-              path="productos/:id"
-              element={<ProductoDetailPage key="detalle" modo="detalle" />} // <--- MODIFICADO: agregado key="detalle"
-            />
-            <Route
-              path="productos/:id/editar"
-              element={<ProductoDetailPage key="editar" modo="editar" />} // <--- MODIFICADO: agregado key="editar"
-            />
-
-            {/* Categorías (Restringido a Administrador y Encargado) */}
-            <Route
-              path="categorias"
               element={
                 <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
-                  <CategoriasListPage />
+                  <ProductoDetailPage key="nuevo" modo="crear" />
                 </RoleRoute>
               }
             />
-            <Route // <--- MODIFICADO: ruta explícita para creación limpia
+            <Route
+              path="productos/:id"
+              element={<ProductoDetailPage key="detalle" modo="detalle" />}
+            />
+            <Route
+              path="productos/:id/editar"
+              element={
+                <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
+                  <ProductoDetailPage key="editar" modo="editar" />
+                </RoleRoute>
+              }
+            />
+
+            {/* Categorías (Lectura para todos; Alta solo Admin y Encargado) */}
+            <Route path="categorias" element={<CategoriasListPage />} />
+            <Route
               path="categorias/nuevo"
               element={
                 <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
@@ -93,18 +94,28 @@ export function App() {
             />
             <Route
               path="categorias/:id"
+              element={<CategoriaDetailPage key="detalle" />}
+            />
+
+            {/* Proveedores (Restringido a Administrador y Encargado) */}
+            <Route
+              path="proveedores"
               element={
                 <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
-                  <CategoriaDetailPage key="detalle" /> {/* <--- MODIFICADO: agregado key="detalle" */}
+                  <ProveedoresListPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="proveedores/:id"
+              element={
+                <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
+                  <ProveedorDetailPage />
                 </RoleRoute>
               }
             />
 
-            {/* Proveedores */}
-            <Route path="proveedores" element={<ProveedoresListPage />} />
-            <Route path="proveedores/:id" element={<ProveedorDetailPage />} />
-
-            {/* Movimientos */}
+            {/* Movimientos (Todos pueden ver y crear; edición/baja controlada en vista) */}
             <Route path="movimientos" element={<MovimientosListPage />} />
             <Route path="movimientos/:id" element={<MovimientoDetailPage />} />
           </Route>

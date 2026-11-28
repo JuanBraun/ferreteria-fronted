@@ -4,9 +4,12 @@ import { Plus, Search, FileSpreadsheet, FileText } from 'lucide-react';
 import { categoriaApi } from '../../api/categoriaApi';
 import type { Categoria } from '../../types/categoria';
 import { exportarCategoriasExcel, exportarCategoriasPDF } from '../../utils/exportCategorias';
+import { useAuth } from '../../hooks/useAuth';
+import { puedeCrear } from '../../utils/permisos';
 
 export function CategoriasListPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [total, setTotal] = useState(0);
@@ -100,13 +103,15 @@ export function CategoriasListPage() {
           >
             <FileText size={16} /> PDF
           </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => navigate('/categorias/nuevo')}
-          >
-            <Plus size={16} /> Nueva Categoría
-          </button>
+          {puedeCrear(user?.rol, 'categorias') && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => navigate('/categorias/nuevo')}
+            >
+              <Plus size={16} /> Nueva Categoría
+            </button>
+          )}
         </div>
       </div>
 

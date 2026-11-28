@@ -3,12 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit3, Trash2, Save } from 'lucide-react';
 import { categoriaApi } from '../../api/categoriaApi';
 import type { Categoria, CategoriaFormData } from '../../types/categoria';
+import { useAuth } from '../../hooks/useAuth';
+import { puedeEditar, puedeEliminar } from '../../utils/permisos';
 
 export function CategoriaDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const esCreacion = !id || id === 'nuevo';
+  const habilitadoEditar = puedeEditar(user?.rol, 'categorias');
+  const habilitadoEliminar = puedeEliminar(user?.rol, 'categorias');
+
   const [editando, setEditando] = useState(esCreacion);
 
   const [categoria, setCategoria] = useState<Categoria | null>(null);
@@ -123,18 +129,22 @@ export function CategoriaDetailPage() {
 
         {!esCreacion && !editando && (
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button type="button" className="btn btn-outline" onClick={() => setEditando(true)}>
-              <Edit3 size={16} /> Editar
-            </button>
-            <button
-              type="button"
-              className="btn btn-outline"
-              style={{ color: '#991b1b', borderColor: '#fca5a5' }}
-              disabled={guardando}
-              onClick={handleEliminar}
-            >
-              <Trash2 size={16} /> Eliminar
-            </button>
+            {habilitadoEditar && (
+              <button type="button" className="btn btn-outline" onClick={() => setEditando(true)}>
+                <Edit3 size={16} /> Editar
+              </button>
+            )}
+            {habilitadoEliminar && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                style={{ color: '#991b1b', borderColor: '#fca5a5' }}
+                disabled={guardando}
+                onClick={handleEliminar}
+              >
+                <Trash2 size={16} /> Eliminar
+              </button>
+            )}
           </div>
         )}
       </div>
