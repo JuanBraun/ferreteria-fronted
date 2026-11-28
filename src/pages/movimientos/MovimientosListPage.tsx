@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, FileSpreadsheet, FileText, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { apiClient } from '../../api/apiClient';
+import { productoApi } from '../../api/productoApi';
 import type { PaginatedData } from '../../types/api';
 import type { Movimiento } from '../../types/movimiento';
 import { exportarMovimientosExcel, exportarMovimientosPDF } from '../../utils/exportMovimientos';
@@ -33,20 +34,49 @@ export function MovimientosListPage() {
       setLoading(true);
       setError('');
       try {
+        const termino = search.trim().toLowerCase();
         const params = new URLSearchParams({
-          page: String(page),
-          limit: String(limit),
+          page: termino ? '1' : String(page),
+          limit: termino ? '100' : String(limit),
           sortBy,
           order,
         });
-        if (search.trim()) params.append('search', search.trim());
         if (tipoFiltro) params.append('tipo', tipoFiltro);
 
-        const data = await apiClient.get<PaginatedData<Movimiento>>(`/movimientos?${params.toString()}`);
+        const [data, prodData] = await Promise.all([
+          apiClient.get<PaginatedData<Movimiento>>(`/movimientos?${params.toString()}`),
+          productoApi.listar({ limit: 100 }).catch(() => ({ items: [] })),
+        ]);
+
         if (!activo) return;
-        setMovimientos(data.items);
-        setTotal(data.meta.total);
-        setTotalPages(data.meta.totalPages || 1);
+
+        const mapaProductos = new Map(
+          prodData.items.map((p) => [p.id, p.nombre]),
+        );
+
+        const enriquecidos = data.items.map((mov) => ({
+          ...mov,
+          productoNombre:
+            mov.productoNombre ||
+            mapaProductos.get(mov.productoId) ||
+            `Producto #${mov.productoId}`,
+        }));
+
+        if (termino) {
+          const filtrados = enriquecidos.filter(
+            (mov) =>
+              mov.motivo.toLowerCase().includes(termino) ||
+              (mov.productoNombre ?? '').toLowerCase().includes(termino),
+          );
+          const inicio = (page - 1) * limit;
+          setMovimientos(filtrados.slice(inicio, inicio + limit));
+          setTotal(filtrados.length);
+          setTotalPages(Math.max(1, Math.ceil(filtrados.length / limit)));
+        } else {
+          setMovimientos(enriquecidos);
+          setTotal(data.meta.total);
+          setTotalPages(data.meta.totalPages || 1);
+        }
       } catch (err) {
         if (activo) {
           setError(err instanceof Error ? err.message : 'Error al cargar movimientos');

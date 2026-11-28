@@ -85,8 +85,13 @@ export function MovimientoDetailPage() {
     setSaving(true);
     try {
       if (isNew) {
+        const productoSeleccionado = productos.find(
+          (p) => p.id === Number(productoId),
+        );
+
         await apiClient.post('/movimientos', {
           productoId: Number(productoId),
+          productoNombre: productoSeleccionado?.nombre,
           tipo,
           cantidad: Number(cantidad),
           motivo,
