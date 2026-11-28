@@ -8,7 +8,7 @@ export function CategoriaDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const esCreacion = id === 'nuevo';
+  const esCreacion = !id || id === 'nuevo';
   const [editando, setEditando] = useState(esCreacion);
 
   const [categoria, setCategoria] = useState<Categoria | null>(null);
@@ -20,9 +20,6 @@ export function CategoriaDetailPage() {
 
   useEffect(() => {
     if (esCreacion || !id) {
-      setLoading(false);
-      setEditando(true);
-      setForm({ nombre: '', descripcion: '' });
       return;
     }
 

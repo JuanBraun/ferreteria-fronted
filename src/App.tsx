@@ -67,11 +67,11 @@ export function App() {
             />
             <Route
               path="productos/:id"
-              element={<ProductoDetailPage modo="detalle" />}
+              element={<ProductoDetailPage key="detalle" modo="detalle" />} // <--- MODIFICADO: agregado key="detalle"
             />
             <Route
               path="productos/:id/editar"
-              element={<ProductoDetailPage modo="editar" />}
+              element={<ProductoDetailPage key="editar" modo="editar" />} // <--- MODIFICADO: agregado key="editar"
             />
 
             {/* Categorías (Restringido a Administrador y Encargado) */}
@@ -83,11 +83,19 @@ export function App() {
                 </RoleRoute>
               }
             />
+            <Route // <--- MODIFICADO: ruta explícita para creación limpia
+              path="categorias/nuevo"
+              element={
+                <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
+                  <CategoriaDetailPage key="nuevo" />
+                </RoleRoute>
+              }
+            />
             <Route
               path="categorias/:id"
               element={
                 <RoleRoute rolesPermitidos={["Administrador", "Encargado"]}>
-                  <CategoriaDetailPage />
+                  <CategoriaDetailPage key="detalle" /> {/* <--- MODIFICADO: agregado key="detalle" */}
                 </RoleRoute>
               }
             />
